@@ -7,7 +7,7 @@ import smtplib
 from email.message import EmailMessage
 
 # Replace with your actual API keys and credentials
-client = OpenAI(api_key="YOUR_OPENAI_API_KEY")
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 AIRTABLE_API_KEY = "YOUR_AIRTABLE_API_KEY"
 AIRTABLE_BASE_ID = "YOUR_AIRTABLE_BASE_ID"
 AIRTABLE_PROJECTS_TABLE = "Projects"
