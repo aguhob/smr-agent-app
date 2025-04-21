@@ -8,8 +8,8 @@ from email.message import EmailMessage
 
 # Replace with your actual API keys and credentials
 os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
-AIRTABLE_API_KEY = "patVw0aOUnFYSWJ4N.d6f66d7fc31d437fbb91b33c68d44425ef4d673f0bf0142603512102b01945df"
-AIRTABLE_BASE_ID = "appVYKA73Mu0Bv1GT"
+os.environ['AIRTABLE_API_KEY'] = st.secrets['AIRTABLE_API_KEY']
+os.environ['AIRTABLE_BASE_ID'] = st.secrets['AIRTABLE_BASE_ID']
 AIRTABLE_PROJECTS_TABLE = "Projects"
 AIRTABLE_RISKS_TABLE = "Risks"
 AIRTABLE_MITIGATIONS_TABLE = "Mitigations"
