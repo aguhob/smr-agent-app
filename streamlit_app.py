@@ -1,5 +1,5 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 import requests
 import datetime
 from fpdf import FPDF
@@ -7,7 +7,7 @@ import smtplib
 from email.message import EmailMessage
 
 # Replace with your actual API keys and credentials
-openai.api_key = "YOUR_OPENAI_API_KEY"
+client = OpenAI(api_key="YOUR_OPENAI_API_KEY")
 AIRTABLE_API_KEY = "YOUR_AIRTABLE_API_KEY"
 AIRTABLE_BASE_ID = "YOUR_AIRTABLE_BASE_ID"
 AIRTABLE_PROJECTS_TABLE = "Projects"
@@ -89,11 +89,14 @@ if st.button("Run Full Agent Analysis"):
         Partners: {known_partners}
         Respond with: 1) Summary of risks, 2) Recommendation, 3) One-sentence rationale, 4) Rationale details.
         """
-        agent1 = openai.ChatCompletion.create(model="gpt-4", messages=[
-            {"role": "system", "content": "You are a strategic advisor."},
-            {"role": "user", "content": agent1_prompt}
-        ])
-        agent1_output = agent1['choices'][0]['message']['content']
+        agent1 = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a strategic advisor."},
+                {"role": "user", "content": agent1_prompt}
+            ]
+        )
+        agent1_output = agent1.choices[0].message.content
 
     with st.spinner("Running Agent 2: Risk Identification..."):
         agent2_prompt = f"""
@@ -101,11 +104,14 @@ if st.button("Run Full Agent Analysis"):
         Project: {project_name}, Objectives: {', '.join(strategic_objectives)}
         Output: Risk Type, Description, Urgency Level.
         """
-        agent2 = openai.ChatCompletion.create(model="gpt-4", messages=[
-            {"role": "system", "content": "You are a nuclear risk analyst."},
-            {"role": "user", "content": agent2_prompt}
-        ])
-        agent2_output = agent2['choices'][0]['message']['content']
+        agent2 = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a nuclear risk analyst."},
+                {"role": "user", "content": agent2_prompt}
+            ]
+        )
+        agent2_output = agent2.choices[0].message.content
 
     with st.spinner("Running Agent 3: Mitigation Planning..."):
         agent3_prompt = f"""
@@ -113,11 +119,14 @@ if st.button("Run Full Agent Analysis"):
         {agent2_output}
         Generate: Mitigation Strategy per risk, plus execution steps.
         """
-        agent3 = openai.ChatCompletion.create(model="gpt-4", messages=[
-            {"role": "system", "content": "You are a risk mitigation strategist."},
-            {"role": "user", "content": agent3_prompt}
-        ])
-        agent3_output = agent3['choices'][0]['message']['content']
+        agent3 = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a risk mitigation strategist."},
+                {"role": "user", "content": agent3_prompt}
+            ]
+        )
+        agent3_output = agent3.choices[0].message.content
 
     # Generate PDF
     pdf = FPDF()
