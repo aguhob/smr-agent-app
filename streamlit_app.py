@@ -196,12 +196,12 @@ if st.button("Run Full Agent Analysis"):
     msg["From"] = EMAIL_SENDER
     msg["To"] = user_email
     msg["Cc"] = EMAIL_RECIPIENT
-    msg.set_content(f"Hello {user_name},
+    msg.set_content(clean_text(f"Hello {user_name},
 
 Attached is your full AI analysis for the project: {project_name}.
 
 Best regards,
-The Infrastructure AI Agent Pipeline")
+The Infrastructure AI Agent Pipeline"))
     with open(pdf_path, "rb") as f:
         msg.add_attachment(f.read(), maintype="application", subtype="pdf", filename=pdf_path.split("/")[-1])
     with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
