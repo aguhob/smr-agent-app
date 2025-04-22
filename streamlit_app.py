@@ -161,8 +161,7 @@ if st.button("Run Full Agent Analysis"):
     pdf.add_page()
     pdf.multi_cell(0, 10, clean_text(f"Agent 2 Risk Summary:\n{agent2_output}"))
     pdf.add_page()
-    pdf.multi_cell(0, 10, clean_text(f"Agent 3 Mitigation Plan:
-{agent3_output}")))
+    pdf.multi_cell(0, 10, clean_text(f"Agent 3 Mitigation Plan:\n{agent3_output}")))
     pdf_path = f"{project_name.replace(' ', '_')}_AI_Plan.pdf"
     pdf.output(pdf_path)
     st.success("PDF Generated!")
