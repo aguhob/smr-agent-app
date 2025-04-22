@@ -20,9 +20,9 @@ AIRTABLE_MITIGATIONS_TABLE = "Mitigations"
 
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
-EMAIL_SENDER = "you@example.com"
-EMAIL_PASSWORD = "yourpassword"
-EMAIL_RECIPIENT = "stakeholder@example.com"
+EMAIL_SENDER = st.secrets["EMAIL_SENDER"]
+EMAIL_PASSWORD = st.secrets["EMAIL_PASSWORD"]
+EMAIL_RECIPIENT = st.secrets["EMAIL_RECIPIENT"]
 
 st.title("Infrastructure AI Agent Pipeline")
 
