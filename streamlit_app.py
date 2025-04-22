@@ -157,14 +157,12 @@ if st.button("Run Full Agent Analysis"):
     pdf.set_font("Arial", size=12)
     pdf.multi_cell(0, 10, f"Project Summary\nDate: {datetime.datetime.now().strftime('%Y-%m-%d')}\nProject: {project_name}\nLocation: {location}\nPower Type: {', '.join(power_type)}\nInfrastructure Type: {', '.join(infra_type)}\nObjectives: {', '.join(strategic_objectives)}\nPartners: {known_partners}")
     pdf.ln(5)
-    pdf.multi_cell(0, 10, clean_text(f"Agent 1 Output:
-{agent1_output}"))
+    pdf.multi_cell(0, 10, clean_text(f"Agent 1 Output:\n{agent1_output}"))
     pdf.add_page()
-    pdf.multi_cell(0, 10, clean_text(f"Agent 2 Risk Summary:
-{agent2_output}"))
+    pdf.multi_cell(0, 10, clean_text(f"Agent 2 Risk Summary:\n{agent2_output}"))
     pdf.add_page()
     pdf.multi_cell(0, 10, clean_text(f"Agent 3 Mitigation Plan:
-{agent3_output}"))
+{agent3_output}")))
     pdf_path = f"{project_name.replace(' ', '_')}_AI_Plan.pdf"
     pdf.output(pdf_path)
     st.success("PDF Generated!")
