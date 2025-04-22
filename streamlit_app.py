@@ -154,6 +154,15 @@ if st.button("Run Full Agent Analysis"):
             ]
         )
         agent3_output = agent3.choices[0].message.content
+        
+        st.markdown("---")
+        st.markdown("### 👇 Want to try something interactive?")
+        st.markdown("Use the voice assistant to explore local risks and community feedback.")
+
+        if st.button("🎙️ Go to Voice Risk Assistant"):
+            st.markdown("[Click here to open the Voice Assistant](./voice_risk_assistant)")
+
+        
 
     # Generate PDF
     pdf = FPDF()
