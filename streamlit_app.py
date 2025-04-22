@@ -21,6 +21,27 @@ EMAIL_PASSWORD = "yourpassword"
 EMAIL_RECIPIENT = "stakeholder@example.com"
 
 st.title("Infrastructure AI Agent Pipeline")
+
+# Dashboard section
+st.sidebar.title("📊 View Past Submissions")
+if st.sidebar.button("Load Submissions"):
+    with st.spinner("Fetching submissions from Airtable..."):
+        response = requests.get(
+            f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{AIRTABLE_PROJECTS_TABLE}",
+            headers={"Authorization": f"Bearer {AIRTABLE_API_KEY}"}
+        )
+        if response.status_code == 200:
+            records = response.json().get("records", [])
+            st.subheader("📁 Past Submissions")
+            for record in records:
+                fields = record.get("fields", {})
+                st.markdown(f"**Project:** {fields.get('Project Name', 'N/A')}")
+                st.markdown(f"Submitted by: {fields.get('Submitter Name', 'N/A')} ({fields.get('Submitter Email', 'N/A')})")
+                st.markdown(f"Submitted on: {fields.get('Date Submitted', 'N/A')}")
+                st.markdown(f"**Agent 1 Summary:** {fields.get('Agent 1 Summary', '')[:500]}...")
+                st.markdown("---")
+        else:
+            st.error("Failed to load submissions from Airtable.")
 st.write("Submit a project to evaluate viability, risks, and mitigation strategies.")
 
 project_name = st.text_input("Project Name")
@@ -75,6 +96,8 @@ timeline_constraints = st.multiselect("Desired Timeline or Constraints Being Con
 ])
 
 known_partners = st.text_input("Who are Some Known Developers, Vendors or Partners")
+user_name = st.text_input("Your Name")
+user_email = st.text_input("Your Contact Email")
 
 if st.button("Run Full Agent Analysis"):
     with st.spinner("Running Agent 1: Strategic Recommendation..."):
@@ -134,22 +157,54 @@ if st.button("Run Full Agent Analysis"):
     pdf.set_font("Arial", size=12)
     pdf.multi_cell(0, 10, f"Project Summary\nDate: {datetime.datetime.now().strftime('%Y-%m-%d')}\nProject: {project_name}\nLocation: {location}\nPower Type: {', '.join(power_type)}\nInfrastructure Type: {', '.join(infra_type)}\nObjectives: {', '.join(strategic_objectives)}\nPartners: {known_partners}")
     pdf.ln(5)
-    pdf.multi_cell(0, 10, f"Agent 1 Output:\n{agent1_output}")
+    pdf.multi_cell(0, 10, f"Agent 1 Output:
+{clean_text(agent1_output)}")
     pdf.add_page()
-    pdf.multi_cell(0, 10, f"Agent 2 Risk Summary:\n{agent2_output}")
+    pdf.multi_cell(0, 10, f"Agent 2 Risk Summary:
+{clean_text(agent2_output)}")
     pdf.add_page()
-    pdf.multi_cell(0, 10, f"Agent 3 Mitigation Plan:\n{agent3_output}")
+    pdf.multi_cell(0, 10, f"Agent 3 Mitigation Plan:
+{clean_text(agent3_output)}")
     pdf_path = f"{project_name.replace(' ', '_')}_AI_Plan.pdf"
     pdf.output(pdf_path)
     st.success("PDF Generated!")
     st.download_button("Download PDF", file_name=pdf_path.split("/")[-1], data=open(pdf_path, "rb"), mime="application/pdf")
 
+    # Save to Airtable
+    airtable_data = {
+        "Project Name": project_name,
+        "Location": location,
+        "Power Type": ", ".join(power_type),
+        "Infrastructure Type": ", ".join(infra_type),
+        "Objectives": ", ".join(strategic_objectives),
+        "Anticipated Risks": ", ".join(anticipated_risks),
+        "Timeline Constraints": ", ".join(timeline_constraints),
+        "Partners": known_partners,
+        "Submitter Name": user_name,
+        "Submitter Email": user_email,
+        "Agent 1 Summary": agent1_output,
+        "Agent 2 Risks": agent2_output,
+        "Agent 3 Mitigation": agent3_output,
+        "Date Submitted": datetime.datetime.now().isoformat()
+    }
+    headers = {
+        "Authorization": f"Bearer {AIRTABLE_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    requests.post(f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{AIRTABLE_PROJECTS_TABLE}", json={"fields": airtable_data}, headers=headers)
+
     # Email PDF
     msg = EmailMessage()
     msg["Subject"] = f"AI Project Review: {project_name}"
     msg["From"] = EMAIL_SENDER
-    msg["To"] = EMAIL_RECIPIENT
-    msg.set_content(f"Attached is the full AI analysis for project: {project_name}")
+    msg["To"] = user_email
+    msg["Cc"] = EMAIL_RECIPIENT
+    msg.set_content(f"Hello {user_name},
+
+Attached is your full AI analysis for the project: {project_name}.
+
+Best regards,
+The Infrastructure AI Agent Pipeline")
     with open(pdf_path, "rb") as f:
         msg.add_attachment(f.read(), maintype="application", subtype="pdf", filename=pdf_path.split("/")[-1])
     with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
@@ -157,3 +212,5 @@ if st.button("Run Full Agent Analysis"):
         server.login(EMAIL_SENDER, EMAIL_PASSWORD)
         server.send_message(msg)
     st.success("PDF emailed to stakeholder!")
+    st.markdown("### ✅ Submission Complete")
+    st.markdown(f"Thanks, **{user_name}**! A copy of your AI-generated project review has been emailed to you and logged for internal review.")
