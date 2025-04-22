@@ -6,6 +6,10 @@ from fpdf import FPDF
 import smtplib
 from email.message import EmailMessage
 
+# Fix Unicode issues for PDF export
+def clean_text(text):
+    return text.encode("latin1", "replace").decode("latin1")
+
 # Replace with your actual API keys and credentials
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 AIRTABLE_API_KEY = "YOUR_AIRTABLE_API_KEY"
